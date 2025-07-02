@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-edit me-2"></i>Edit Investigation</h2>
+        <div>
+            <a href="{{ url_for('investigation_view', investigation_id=investigation.id) }}" class="btn btn-outline-info me-2">
+                <i class="fas fa-eye me-2"></i>View Details
+            </a>
+            <a href="{{ url_for('investigations_list') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to List
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-search me-2"></i>Investigation Details</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.crime_id.label(class="form-label") }}
+                        {% if form.crime_id.errors %}
+                            {{ form.crime_id(class="form-select is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.crime_id.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.crime_id(class="form-select") }}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.officer_id.label(class="form-label") }}
+                        {% if form.officer_id.errors %}
+                            {{ form.officer_id(class="form-select is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.officer_id.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.officer_id(class="form-select") }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.start_date.label(class="form-label") }}
+                        {% if form.start_date.errors %}
+                            {{ form.start_date(class="form-control is-invalid", type="datetime-local") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.start_date.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.start_date(class="form-control", type="datetime-local") }}
+                        {% endif %}
+                        <small class="form-text text-muted">Format: YYYY-MM-DD HH:MM</small>
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.end_date.label(class="form-label") }}
+                        {% if form.end_date.errors %}
+                            {{ form.end_date(class="form-control is-invalid", type="datetime-local") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.end_date.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.end_date(class="form-control", type="datetime-local") }}
+                        {% endif %}
+                        <small class="form-text text-muted">Format: YYYY-MM-DD HH:MM (Optional)</small>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    {{ form.status.label(class="form-label") }}
+                    {% if form.status.errors %}
+                        {{ form.status(class="form-select is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.status.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.status(class="form-select") }}
+                    {% endif %}
+                    <small class="form-text text-muted">Note: Setting status to "Completed" may update the crime status.</small>
+                </div>
+                <div class="mb-3">
+                    {{ form.progress_notes.label(class="form-label") }}
+                    {% if form.progress_notes.errors %}
+                        {{ form.progress_notes(class="form-control is-invalid", rows="4") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.progress_notes.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.progress_notes(class="form-control", rows="4") }}
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.findings.label(class="form-label") }}
+                    {% if form.findings.errors %}
+                        {{ form.findings(class="form-control is-invalid", rows="4") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.findings.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.findings(class="form-control", rows="4") }}
+                    {% endif %}
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{{ url_for('investigation_view', investigation_id=investigation.id) }}" class="btn btn-secondary me-md-2">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Update Investigation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

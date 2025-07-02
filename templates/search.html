@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-search me-2"></i>Search Records</h2>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Search Criteria</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('search') }}">
+                {{ form.hidden_tag() }}
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            {{ form.query(class="form-control", placeholder="Enter search terms...") }}
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Search
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.category(class="form-select") }}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if results %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Search Results</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <!-- Crime results -->
+                {% if category == 'crime' %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Location</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for crime in results %}
+                        <tr>
+                            <td>{{ crime.id }}</td>
+                            <td>{{ crime.title }}</td>
+                            <td>{{ crime.type }}</td>
+                            <td>{{ crime.location }}</td>
+                            <td>{{ crime.date_occurred.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <span class="badge bg-{{ get_status_badge_color(crime.status) }}">
+                                    {{ crime.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('crime_view', crime_id=crime.id) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <!-- Offender results -->
+                {% elif category == 'offender' %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>Date of Birth</th>
+                            <th>Identification</th>
+                            <th>Address</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for offender in results %}
+                        <tr>
+                            <td>{{ offender.id }}</td>
+                            <td>{{ offender.name }}</td>
+                            <td>{{ offender.gender if offender.gender else 'Not Specified' }}</td>
+                            <td>{{ offender.dob.strftime('%Y-%m-%d') if offender.dob else 'Unknown' }}</td>
+                            <td>{{ offender.identification if offender.identification else 'N/A' }}</td>
+                            <td>{{ offender.address if offender.address else 'N/A' }}</td>
+                            <td>
+                                <a href="{{ url_for('offender_view', offender_id=offender.id) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <!-- Investigation results -->
+                {% elif category == 'investigation' %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Crime</th>
+                            <th>Officer</th>
+                            <th>Start Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for investigation in results %}
+                        <tr>
+                            <td>{{ investigation.id }}</td>
+                            <td>
+                                {% if investigation.crime %}
+                                <a href="{{ url_for('crime_view', crime_id=investigation.crime_id) }}">{{ investigation.crime.title }}</a>
+                                {% else %}
+                                Unknown Crime
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if investigation.assigned_officer %}
+                                {{ investigation.assigned_officer.full_name }}
+                                {% else %}
+                                Unassigned
+                                {% endif %}
+                            </td>
+                            <td>{{ investigation.start_date.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <span class="badge bg-{{ get_status_badge_color(investigation.status) }}">
+                                    {{ investigation.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('investigation_view', investigation_id=investigation.id) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <!-- Legal proceedings results -->
+                {% elif category == 'legal' %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Case Number</th>
+                            <th>Crime</th>
+                            <th>Court</th>
+                            <th>Judge</th>
+                            <th>Status</th>
+                            <th>Hearing Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for legal in results %}
+                        <tr>
+                            <td>{{ legal.case_number }}</td>
+                            <td>
+                                {% if legal.crime %}
+                                <a href="{{ url_for('crime_view', crime_id=legal.crime_id) }}">{{ legal.crime.title }}</a>
+                                {% else %}
+                                Unknown Crime
+                                {% endif %}
+                            </td>
+                            <td>{{ legal.court_name }}</td>
+                            <td>{{ legal.judge if legal.judge else 'Not assigned' }}</td>
+                            <td>
+                                <span class="badge bg-{{ get_status_badge_color(legal.status) }}">
+                                    {{ legal.status }}
+                                </span>
+                            </td>
+                            <td>{{ legal.hearing_date.strftime('%Y-%m-%d') if legal.hearing_date else 'Not scheduled' }}</td>
+                            <td>
+                                <a href="{{ url_for('legal_view', legal_id=legal.id) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% elif request.method == 'POST' or request.args.get('query') %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>No results found</h4>
+            <p class="text-muted">Try different search terms or categories.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

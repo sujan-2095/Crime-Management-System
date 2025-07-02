@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-gavel me-2"></i>Legal Proceedings</h2>
+        <a href="{{ url_for('legal_create') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add Legal Proceeding
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Proceedings</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('legal_list') }}" class="row g-3">
+                <div class="col-md-4">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">All Statuses</option>
+                        {% for status in statuses %}
+                        <option value="{{ status }}" {% if current_status == status %}selected{% endif %}>{{ status }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="date_from" class="form-label">Hearing Date From</label>
+                    <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="date_to" class="form-label">Hearing Date To</label>
+                    <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to }}">
+                </div>
+                <div class="col-12 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search me-2"></i>Apply Filters
+                    </button>
+                    <a href="{{ url_for('legal_list') }}" class="btn btn-secondary">
+                        <i class="fas fa-redo me-2"></i>Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Legal Proceedings List -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-gavel me-2"></i>Legal Cases</h5>
+        </div>
+        <div class="card-body">
+            {% if legal_proceedings.items %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Case Number</th>
+                            <th>Crime</th>
+                            <th>Court</th>
+                            <th>Hearing Date</th>
+                            <th>Status</th>
+                            <th>Verdict</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for legal in legal_proceedings.items %}
+                        <tr>
+                            <td>{{ legal.case_number }}</td>
+                            <td>
+                                {% if legal.crime %}
+                                <a href="{{ url_for('crime_view', crime_id=legal.crime_id) }}">
+                                    {{ legal.crime.title }}
+                                </a>
+                                {% else %}
+                                Unknown Crime
+                                {% endif %}
+                            </td>
+                            <td>{{ legal.court_name }}</td>
+                            <td>{{ legal.hearing_date.strftime('%Y-%m-%d') if legal.hearing_date else 'Not scheduled' }}</td>
+                            <td>
+                                <span class="badge bg-{{ get_status_badge_color(legal.status) }}">
+                                    {{ legal.status }}
+                                </span>
+                            </td>
+                            <td>{{ legal.verdict if legal.verdict else 'Pending' }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('legal_view', legal_id=legal.id) }}" class="btn btn-info" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('legal_edit', legal_id=legal.id) }}" class="btn btn-warning" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ legal.id }}" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Delete Confirmation Modal -->
+                                <div class="modal fade" id="deleteModal-{{ legal.id }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ legal.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel-{{ legal.id }}">Confirm Delete</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to delete this legal proceeding record?
+                                                <p class="text-danger mt-2">This action cannot be undone.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form action="{{ url_for('legal_delete', legal_id=legal.id) }}" method="POST">
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if legal_proceedings.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('legal_list', page=legal_proceedings.prev_num, status=current_status, date_from=date_from, date_to=date_to) }}">
+                            Previous
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in legal_proceedings.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                    <li class="page-item {{ 'active' if page_num == legal_proceedings.page else '' }}">
+                        <a class="page-link" href="{{ url_for('legal_list', page=page_num, status=current_status, date_from=date_from, date_to=date_to) }}">
+                            {{ page_num }}
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">...</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if legal_proceedings.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('legal_list', page=legal_proceedings.next_num, status=current_status, date_from=date_from, date_to=date_to) }}">
+                            Next
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-gavel fa-3x mb-3 text-muted"></i>
+                <p class="lead">No legal proceedings found matching your criteria.</p>
+                <a href="{{ url_for('legal_create') }}" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus me-2"></i>Add Legal Proceeding
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

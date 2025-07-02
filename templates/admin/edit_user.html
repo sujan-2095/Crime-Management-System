@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-user-edit me-2"></i>Edit User: {{ user.username }}</h2>
+        <a href="{{ url_for('admin_users') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to User List
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-user me-2"></i>User Information</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" value="{{ user.username }}" readonly>
+                            <small class="form-text text-muted">Username cannot be changed.</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.email.label(class="form-label") }}
+                        {% if form.email.errors %}
+                            {{ form.email(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.email(class="form-control") }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.full_name.label(class="form-label") }}
+                        {% if form.full_name.errors %}
+                            {{ form.full_name(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.full_name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.full_name(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.badge_number.label(class="form-label") }}
+                        {% if form.badge_number.errors %}
+                            {{ form.badge_number(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.badge_number.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.badge_number(class="form-control") }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.department.label(class="form-label") }}
+                        {% if form.department.errors %}
+                            {{ form.department(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.department.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.department(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.role.label(class="form-label") }}
+                        {% if form.role.errors %}
+                            {{ form.role(class="form-select is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.role.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.role(class="form-select") }}
+                        {% endif %}
+                        {% if user.id == current_user.id %}
+                        <small class="form-text text-danger">Changing your own role may affect your permissions.</small>
+                        {% else %}
+                        <small class="form-text text-muted">Admin role grants full system access.</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-secondary me-md-2">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Update User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Additional Actions</h5>
+        </div>
+        <div class="card-body">
+            <p>To reset the user's password, you must delete this user account and create a new one.</p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                {% if user.id != current_user.id %}
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="fas fa-trash me-2"></i>Delete User
+                </button>
+                {% else %}
+                <button type="button" class="btn btn-danger" disabled>
+                    <i class="fas fa-trash me-2"></i>Cannot Delete Your Own Account
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the user: <strong>{{ user.username }}</strong>?</p>
+                    <p class="text-danger fw-bold">This action cannot be undone and will remove all data associated with this user.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form action="{{ url_for('admin_delete_user', user_id=user.id) }}" method="POST">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

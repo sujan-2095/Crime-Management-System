@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-user-plus me-2"></i>Create New Offender Profile</h2>
+        <a href="{{ url_for('offenders_list') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-user-secret me-2"></i>Offender Details</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.name.label(class="form-label") }}
+                        {% if form.name.errors %}
+                            {{ form.name(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.name(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.gender.label(class="form-label") }}
+                        {% if form.gender.errors %}
+                            {{ form.gender(class="form-select is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.gender.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.gender(class="form-select") }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.dob.label(class="form-label") }}
+                        {% if form.dob.errors %}
+                            {{ form.dob(class="form-control is-invalid", type="date") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.dob.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.dob(class="form-control", type="date") }}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.identification.label(class="form-label") }}
+                        {% if form.identification.errors %}
+                            {{ form.identification(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.identification.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.identification(class="form-control") }}
+                            <small class="form-text text-muted">ID number, SSN, passport, etc.</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.contact.label(class="form-label") }}
+                        {% if form.contact.errors %}
+                            {{ form.contact(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.contact.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.contact(class="form-control") }}
+                            <small class="form-text text-muted">Phone number or email</small>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.address.label(class="form-label") }}
+                        {% if form.address.errors %}
+                            {{ form.address(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.address.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.address(class="form-control") }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    {{ form.description.label(class="form-label") }}
+                    {% if form.description.errors %}
+                        {{ form.description(class="form-control is-invalid", rows="4") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.description.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.description(class="form-control", rows="4") }}
+                        <small class="form-text text-muted">Additional notes, physical description, etc.</small>
+                    {% endif %}
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    {% if crime_id %}
+                    <a href="{{ url_for('crime_view', crime_id=crime_id) }}" class="btn btn-secondary me-md-2">Cancel</a>
+                    {% else %}
+                    <a href="{{ url_for('offenders_list') }}" class="btn btn-secondary me-md-2">Cancel</a>
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Offender Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

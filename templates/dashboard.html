@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h2>
+    
+    <div class="row mb-4">
+        <!-- Summary Cards -->
+        <div class="col-md-3">
+            <div class="card text-bg-primary mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Total Crimes</h6>
+                            <h2 class="mb-0">{{ crime_count }}</h2>
+                        </div>
+                        <i class="fas fa-clipboard-list fa-3x opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a href="{{ url_for('crimes_list') }}" class="small text-white stretched-link">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-bg-danger mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Offenders</h6>
+                            <h2 class="mb-0">{{ offender_count }}</h2>
+                        </div>
+                        <i class="fas fa-user-secret fa-3x opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a href="{{ url_for('offenders_list') }}" class="small text-white stretched-link">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-bg-info mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Investigations</h6>
+                            <h2 class="mb-0">{{ investigation_count }}</h2>
+                        </div>
+                        <i class="fas fa-search fa-3x opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a href="{{ url_for('investigations_list') }}" class="small text-white stretched-link">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-bg-success mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Legal Cases</h6>
+                            <h2 class="mb-0">{{ legal_count }}</h2>
+                        </div>
+                        <i class="fas fa-gavel fa-3x opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a href="{{ url_for('legal_list') }}" class="small text-white stretched-link">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Activities -->
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Recent Crime Reports</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_crimes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Date Reported</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for crime in recent_crimes %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('crime_view', crime_id=crime.id) }}">{{ crime.title }}</a>
+                                    </td>
+                                    <td>{{ crime.type }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ get_status_badge_color(crime.status) }}">
+                                            {{ crime.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ crime.date_reported.strftime('%Y-%m-%d') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center">No recent crime reports.</p>
+                    {% endif %}
+                    <div class="text-end mt-2">
+                        <a href="{{ url_for('crimes_list') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-search me-2"></i>Recent Investigations</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_investigations %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Crime</th>
+                                    <th>Status</th>
+                                    <th>Start Date</th>
+                                    <th>Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for investigation in recent_investigations %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('investigation_view', investigation_id=investigation.id) }}">
+                                            {% if investigation.crime %}
+                                            {{ investigation.crime.title }}
+                                            {% else %}
+                                            Unknown Crime
+                                            {% endif %}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ get_status_badge_color(investigation.status) }}">
+                                            {{ investigation.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ investigation.start_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ investigation.updated_at.strftime('%Y-%m-%d') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center">No recent investigations.</p>
+                    {% endif %}
+                    <div class="text-end mt-2">
+                        <a href="{{ url_for('investigations_list') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('crime_create') }}" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-plus-circle me-2"></i>New Crime
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('offender_create') }}" class="btn btn-danger btn-lg w-100">
+                                <i class="fas fa-plus-circle me-2"></i>New Offender
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('investigation_create') }}" class="btn btn-info btn-lg w-100">
+                                <i class="fas fa-plus-circle me-2"></i>New Investigation
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('legal_create') }}" class="btn btn-success btn-lg w-100">
+                                <i class="fas fa-plus-circle me-2"></i>New Legal Case
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <div class="row mb-4">
+        <!-- Charts Row -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Crime by Type</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="crimeTypeChart" width="100%" height="40"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Cases by Status</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="crimeStatusChart" width="100%" height="40"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Chart data from server
+    const crimeByTypeData = {
+        labels: [{% for type, count in crime_by_type %}'{{ type }}',{% endfor %}],
+        datasets: [{
+            data: [{% for type, count in crime_by_type %}{{ count }},{% endfor %}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 206, 86, 0.7)',
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(153, 102, 255, 0.7)',
+                'rgba(255, 159, 64, 0.7)',
+                'rgba(199, 199, 199, 0.7)',
+                'rgba(83, 102, 255, 0.7)',
+                'rgba(40, 159, 64, 0.7)',
+                'rgba(210, 199, 199, 0.7)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(199, 199, 199, 1)',
+                'rgba(83, 102, 255, 1)',
+                'rgba(40, 159, 64, 1)',
+                'rgba(210, 199, 199, 1)'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    const crimeByStatusData = {
+        labels: [{% for status, count in crime_by_status %}'{{ status }}',{% endfor %}],
+        datasets: [{
+            data: [{% for status, count in crime_by_status %}{{ count }},{% endfor %}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.7)',  // Open - Red
+                'rgba(255, 206, 86, 0.7)',  // Under Investigation - Yellow
+                'rgba(153, 102, 255, 0.7)', // Closed - Purple
+                'rgba(75, 192, 192, 0.7)'   // Solved - Green
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(75, 192, 192, 1)'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    // Create charts
+    window.addEventListener('load', function() {
+        // Crime Type Chart
+        const crimeTypeCtx = document.getElementById('crimeTypeChart').getContext('2d');
+        new Chart(crimeTypeCtx, {
+            type: 'pie',
+            data: crimeByTypeData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Crime Distribution by Type'
+                    }
+                }
+            }
+        });
+
+        // Crime Status Chart
+        const crimeStatusCtx = document.getElementById('crimeStatusChart').getContext('2d');
+        new Chart(crimeStatusCtx, {
+            type: 'bar',
+            data: crimeByStatusData,
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    title: {
+                        display: true,
+                        text: 'Cases by Status'
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

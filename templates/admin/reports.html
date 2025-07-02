@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-chart-line me-2"></i>Reports & Analytics</h2>
+        <div class="btn-group" role="group">
+            <a href="{{ url_for('admin_reports', period='week') }}" class="btn btn-outline-primary {{ 'active' if period == 'week' else '' }}">Week</a>
+            <a href="{{ url_for('admin_reports', period='month') }}" class="btn btn-outline-primary {{ 'active' if period == 'month' else '' }}">Month</a>
+            <a href="{{ url_for('admin_reports', period='year') }}" class="btn btn-outline-primary {{ 'active' if period == 'year' else '' }}">Year</a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Crime Type Distribution -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Crime Type Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="crimeTypeChart" width="100%" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Crime Status Distribution -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Case Status Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="crimeStatusChart" width="100%" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Crime Trend Over Time -->
+        <div class="col-md-8">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Crime Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="crimeTrendChart" width="100%" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Officer Performance -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-check me-2"></i>Officer Cases</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="officerPerformanceChart" width="100%" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Investigation Status -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-search me-2"></i>Investigation Status</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="investigationStatusChart" width="100%" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Legal Proceedings Status -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-gavel me-2"></i>Legal Proceedings Status</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="legalStatusChart" width="100%" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Parse data from backend
+        const crimesByType = {{ crimes_by_type|safe }};
+        const crimesByStatus = {{ crimes_by_status|safe }};
+        const crimesOverTime = {{ crimes_over_time|safe }};
+        const investigationsByStatus = {{ investigations_by_status|safe }};
+        const legalByStatus = {{ legal_by_status|safe }};
+        const officerPerformance = {{ officer_performance|safe }};
+
+        // Crime Type Distribution Chart
+        new Chart(document.getElementById('crimeTypeChart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: crimesByType.labels,
+                datasets: [{
+                    data: crimesByType.values,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)',
+                        'rgba(255, 159, 64, 0.7)',
+                        'rgba(199, 199, 199, 0.7)',
+                        'rgba(83, 102, 255, 0.7)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Crime Types'
+                    }
+                }
+            }
+        });
+
+        // Crime Status Distribution Chart
+        new Chart(document.getElementById('crimeStatusChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: crimesByStatus.labels,
+                datasets: [{
+                    data: crimesByStatus.values,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',    // Open
+                        'rgba(255, 206, 86, 0.7)',    // Under Investigation
+                        'rgba(153, 102, 255, 0.7)',   // Closed
+                        'rgba(75, 192, 192, 0.7)',    // Solved
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Case Statuses'
+                    }
+                }
+            }
+        });
+
+        // Crime Trend Over Time Chart
+        new Chart(document.getElementById('crimeTrendChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: crimesOverTime.labels,
+                datasets: [{
+                    label: 'Reported Crimes',
+                    data: crimesOverTime.values,
+                    fill: false,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Crime Reports Over Time'
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Crimes'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Investigation Status Chart
+        new Chart(document.getElementById('investigationStatusChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: investigationsByStatus.labels,
+                datasets: [{
+                    label: 'Investigations',
+                    data: investigationsByStatus.values,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)',   // Active
+                        'rgba(255, 206, 86, 0.7)',   // Suspended
+                        'rgba(75, 192, 192, 0.7)',   // Completed
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Investigation Status Distribution'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Legal Proceedings Status Chart
+        new Chart(document.getElementById('legalStatusChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: legalByStatus.labels,
+                datasets: [{
+                    label: 'Legal Cases',
+                    data: legalByStatus.values,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)',   // Pending
+                        'rgba(255, 206, 86, 0.7)',   // In Progress
+                        'rgba(75, 192, 192, 0.7)',   // Closed
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Legal Proceedings Status'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Officer Performance Chart
+        new Chart(document.getElementById('officerPerformanceChart').getContext('2d'), {
+            type: 'horizontalBar',
+            data: {
+                labels: officerPerformance.labels,
+                datasets: [{
+                    label: 'Assigned Cases',
+                    data: officerPerformance.values,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Cases per Officer'
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

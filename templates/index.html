@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="jumbotron bg-dark p-5 rounded mb-4">
+        <h1 class="display-4">Crime Record Management System</h1>
+        <p class="lead">A comprehensive solution for police departments to efficiently manage crime records, investigations, and legal proceedings.</p>
+        <hr class="my-4">
+        <p>Streamline your department's data handling with our secure, reliable, and easy-to-use system.</p>
+        {% if current_user.is_authenticated %}
+        <a class="btn btn-primary btn-lg" href="{{ url_for('dashboard') }}" role="button">
+            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+        </a>
+        {% else %}
+        <a class="btn btn-primary btn-lg" href="{{ url_for('login') }}" role="button">
+            <i class="fas fa-sign-in-alt me-2"></i>Login to System
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-clipboard-list me-2"></i>Crime Reports</h5>
+                    <p class="card-text">Log new crimes with comprehensive details including type, location, date, and status. Update records and track investigation progress.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-user-secret me-2"></i>Offender Management</h5>
+                    <p class="card-text">Maintain detailed profiles of offenders and link them to relevant crimes. Filter and search by various parameters.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-gavel me-2"></i>Legal Proceedings</h5>
+                    <p class="card-text">Track court cases, hearings, and legal outcomes related to crimes in your jurisdiction.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-search me-2"></i>Investigation Tracking</h5>
+                </div>
+                <div class="card-body">
+                    <p>Create and manage investigations for crimes, assign officers, log progress, and update statuses in real-time.</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Assign officers to cases</li>
+                        <li class="list-group-item">Log investigation progress</li>
+                        <li class="list-group-item">Update case statuses</li>
+                        <li class="list-group-item">Link evidence and findings</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Reports & Analytics</h5>
+                </div>
+                <div class="card-body">
+                    <p>Gain insights into crime trends, solved cases rates, and department performance with our comprehensive analytics tools.</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Crime type distribution</li>
+                        <li class="list-group-item">Case resolution rates</li>
+                        <li class="list-group-item">Officer performance metrics</li>
+                        <li class="list-group-item">Geographic crime patterns</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Secure & Reliable</h5>
+                </div>
+                <div class="card-body">
+                    <p>Our system prioritizes data security and reliability:</p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul>
+                                <li>Role-based access control</li>
+                                <li>Comprehensive audit logging</li>
+                                <li>Data encryption</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul>
+                                <li>Regular backups</li>
+                                <li>Activity monitoring</li>
+                                <li>Secure authentication</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

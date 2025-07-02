@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-user-secret me-2"></i>Offender Profiles</h2>
+        <a href="{{ url_for('offender_create') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add Offender
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Offenders</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('offenders_list') }}" class="row g-3">
+                <div class="col-md-5">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ current_name }}" placeholder="Search by name">
+                </div>
+                <div class="col-md-5">
+                    <label for="gender" class="form-label">Gender</label>
+                    <select name="gender" id="gender" class="form-select">
+                        <option value="">All Genders</option>
+                        {% for gender in genders %}
+                        <option value="{{ gender }}" {% if current_gender == gender %}selected{% endif %}>{{ gender }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <div class="d-grid gap-2 w-100">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Offenders List -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-user-secret me-2"></i>Offender Records</h5>
+        </div>
+        <div class="card-body">
+            {% if offenders.items %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>Date of Birth</th>
+                            <th>Identification</th>
+                            <th>Associated Crimes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for offender in offenders.items %}
+                        <tr>
+                            <td>{{ offender.id }}</td>
+                            <td>{{ offender.name }}</td>
+                            <td>{{ offender.gender if offender.gender else 'Not Specified' }}</td>
+                            <td>{{ offender.dob.strftime('%Y-%m-%d') if offender.dob else 'Unknown' }}</td>
+                            <td>{{ offender.identification if offender.identification else 'N/A' }}</td>
+                            <td>{{ offender.crimes.count() }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('offender_view', offender_id=offender.id) }}" class="btn btn-info" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('offender_edit', offender_id=offender.id) }}" class="btn btn-warning" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ offender.id }}" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Delete Confirmation Modal -->
+                                <div class="modal fade" id="deleteModal-{{ offender.id }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ offender.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel-{{ offender.id }}">Confirm Delete</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to delete the offender: <strong>{{ offender.name }}</strong>?
+                                                <p class="text-danger mt-2">This action cannot be undone and will remove the offender from all associated crimes.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form action="{{ url_for('offender_delete', offender_id=offender.id) }}" method="POST">
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if offenders.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('offenders_list', page=offenders.prev_num, gender=current_gender, name=current_name) }}">
+                            Previous
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in offenders.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                    <li class="page-item {{ 'active' if page_num == offenders.page else '' }}">
+                        <a class="page-link" href="{{ url_for('offenders_list', page=page_num, gender=current_gender, name=current_name) }}">
+                            {{ page_num }}
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">...</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if offenders.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('offenders_list', page=offenders.next_num, gender=current_gender, name=current_name) }}">
+                            Next
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-user-slash fa-3x mb-3 text-muted"></i>
+                <p class="lead">No offender profiles found matching your criteria.</p>
+                <a href="{{ url_for('offender_create') }}" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus me-2"></i>Add New Offender
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

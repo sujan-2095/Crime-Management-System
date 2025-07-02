@@ -1,0 +1,209 @@
+/* Custom CSS for Crime Record Management System */
+/* Using professional, accessible color palette */
+
+:root {
+    /* Core Palette */
+    --primary-color: #003366;         /* Midnight Blue - Primary Backgrounds, navbars */
+    --secondary-color: #1A1A2E;       /* Deep Slate - Sidebar, Cards */
+    --accent-color: #e692386f;          /* Saffron - Buttons, links, highlights */
+    --success-color: #228b2298;         /* Forest Green - Success notifications */
+    --danger-color: #b222227b;          /* Indian Red - Danger alerts, error badges */
+    --warning-color: #FFA500;         /* Bright Amber - Warnings, pending statuses */
+    
+    /* Text & Utility */
+    --text-light: #FFFFFFCC;          /* Light text on dark backgrounds */
+    --text-dark: #212529;             /* Dark text on light backgrounds */
+    --bg-light: #F5F7FA;              /* Clean light gray - Forms, cards */
+    --border-light: #D1D1D1;          /* Neutral borders */
+    --link-blue: #0056B3;             /* Interactive links */
+}
+
+/* General Styling Enhancements */
+body {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+}
+
+/* Card Styling */
+.card {
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    margin-bottom: 20px;
+    border: none;
+}
+
+.card-header {
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Status badge colors */
+.badge.bg-danger { background-color: var(--danger-color) !important; }
+.badge.bg-warning { background-color: var(--warning-color) !important; color: var(--text-dark) !important; }
+.badge.bg-success { background-color: var(--success-color) !important; }
+.badge.bg-info,
+.badge.bg-primary { background-color: var(--accent-color) !important; }
+.badge.bg-secondary { background-color: var(--secondary-color) !important; }
+
+/* Navigation */
+.navbar {
+    background-color: #1A1A2E;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.807);
+}
+.navbar-dark .navbar-brand { color: var(--text-light); font-weight: 700; }
+.nav-link { color: var(--text-light) !important; }
+.nav-link:hover, .nav-link:focus { color: var(--warning-color) !important; }
+
+/* ✅ Updated Form Styling for Dark Theme */
+.form-control,
+.form-select,
+textarea {
+    background-color: #1f2937; /* Matches card background */
+    border: 1px solid #4b5563;
+    color: var(--text-light);
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea:focus {
+    background-color: #1a1a2e; /* Slightly darker for focus */
+    border-color: var(--accent-color);
+    color: var(--text-light);
+    /*box-shadow: 0 0 0 0.2rem rgba(210, 25, 25, 0.25); /* Red-accented glow */
+}
+
+textarea::placeholder,
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Table styling */
+.table { color: var(--text-light); }
+.table-hover tbody tr:hover { background-color: rgba(25, 118, 210, 0.1); }
+
+/* Buttons */
+.btn { border-radius: 5px; font-weight: 500; }
+.btn-primary {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+.btn-primary:hover { background-color: #125ea3; border-color: #0e4d8a; }
+.btn-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+.btn-success:hover { background-color: #219a52; border-color: #1e8549; }
+.btn-danger {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+.btn-danger:hover { background-color: #a9302a; border-color: #9f2e25; }
+.btn-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+    color: var(--text-dark);
+}
+.btn-warning:hover {
+    background-color: #d68910;
+    border-color: #cc800f;
+    color: var(--text-dark);
+}
+.btn-info {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--text-light);
+}
+.btn-info:hover { background-color: #125ea3; border-color: #0e4d8a; }
+.btn-outline-secondary {
+    color: var(--text-light);
+    border-color: var(--text-light);
+}
+.btn-outline-secondary:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+/* Modal Styling */
+.modal-content {
+    background-color: var(--secondary-color);
+    color: var(--text-light);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.modal-header, .modal-footer {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Footer */
+footer {
+    background-color: var(--primary-color) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 2rem;
+    color: var(--text-light);
+}
+
+/* Pagination */
+.pagination .page-link {
+    background-color: var(--secondary-color);
+    border-color: var(--primary-color);
+    color: var(--text-light);
+}
+.pagination .page-item.active .page-link {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+.pagination .page-item.disabled .page-link {
+    background-color: var(--secondary-color);
+    border-color: var(--primary-color);
+    color: rgba(236, 240, 241, 0.5);
+}
+
+/* Alerts */
+.alert-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+    color: var(--text-light);
+}
+.alert-danger {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+    color: var(--text-light);
+}
+.alert-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+    color: var(--text-dark);
+}
+.alert-info {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--text-light);
+}
+
+/* Labels */
+.form-label {
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+/* Dropdown */
+.dropdown-menu {
+    background-color: var(--secondary-color);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+.dropdown-item {
+    color: var(--text-light);
+}
+.dropdown-item:hover, .dropdown-item:focus {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-body { padding: 1rem; }
+    h2 { font-size: 1.5rem; }
+    .table { font-size: 0.875rem; }
+}
